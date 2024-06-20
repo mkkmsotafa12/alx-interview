@@ -2,64 +2,38 @@
 """ A script that reads stdin line by line and computes metrics """
 
 
-import sys
-import signal
+from sys import stdin
 import re
 
-
+pattern = r'^[\d+\.]+ - \[[\d+-: ]+\] \S+ \/\S+ \S+ (\d+) (\d+)$'
 total_size = 0
-status_codes = {str(i): 0 for i in [200, 301, 400, 401, 403, 404, 405, 500]}
-line_count = 0
-
-# Regular expression pattern for the log lines
-log_pattern = re.compile(
-    r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - "
-    r'\[(.*?)\] "GET /projects/260 HTTP/1\.1" '
-    r"(\d{3}) (\d+)"
-)
-
-
-def print_stats():
-    """Function to print the statistics"""
-    print("File size: {}".format(total_size))
-    for code in sorted(status_codes.keys()):
-        if status_codes[code] > 0:
-            print("{}: {}".format(code, status_codes[code]))
-
-
-def signal_handler(sig, frame):
-    """[TODO:description]
-
-    Args:
-        sig ([TODO:parameter]): [TODO:description]
-        frame ([TODO:parameter]): [TODO:description]
-    """
-    print_stats()
-    sys.exit(0)
-
-
-# Set up signal handling for CTRL+C
-signal.signal(signal.SIGINT, signal_handler)
-
-# Read from stdin line by line
+count = 0
+status_dic = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0,
+              405: 0, 500: 0}
 try:
-    for line in sys.stdin:
-        try:
-            parts = line.split()
-            size = int(parts[-1])
-            code = parts[-2]
+    for line in stdin:
+        match = re.match(pattern, line)
+        if match:
+            status, size = match.groups()
+            try:
+                total_size += int(size)
+                status_dic[int(status)] += 1
+            except Exception:
+                pass
+            count += 1
+        else:
+            print('false')
+            continue
 
-            if code in status_codes:
-                status_codes[code] += 1
-            total_size += size
-            line_count += 1
-            if line_count % 10 == 0:
-                print_stats()
-        except Exception:
-            pass
-
+        if count == 1 or count == 10:
+            print('File size:', total_size)
+            for key, value in status_dic.items():
+                if value > 0:
+                    print(f'{key}: {value}')
+            count = 0
 except KeyboardInterrupt:
-    pass
-
-finally:
-    print_stats()
+    print('File size:', total_size)
+    for key, value in status_dic.items():
+        if value > 0:
+            print(f'{key}: {value}')
+        count = 0
