@@ -6,25 +6,17 @@
 def validUTF8(data):
     """ Number of bytes in the current UTF-8 character """
     num_bytes = 0
-    mask1 = 1 << 7  # 10000000 in binary
-    mask2 = 1 << 6  # 01000000 in binary
-
     for n in data:
+        byte = format(n, '#010b')[-8:]
         if num_bytes == 0:
-            mask = 1 << 7
-            while mask & n:
-                num_bytes += 1
-                mask >>= 1
-
+            if byte[0] == '1':
+                num_bytes = len(byte.split('0')[0])
+            if num_bytes > 4 or byte == 1:
+                return False
             if num_bytes == 0:
                 continue
-
-            if num_bytes == 1 or num_bytes > 4:
-                return False
         else:
-            if not (n & mask1 and not (n & mask2)):
+            if not (byte[0] == '1' and byte[1] == '0'):
                 return False
-
         num_bytes -= 1
-
     return num_bytes == 0
