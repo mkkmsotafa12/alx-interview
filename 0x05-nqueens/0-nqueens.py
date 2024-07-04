@@ -4,77 +4,44 @@
 import sys
 
 
-def check_n(args):
+class NQueensSolver:
     """
-        function to chcek n passed as argument
+    Class to solve the N Queens problem using a shared C library """
+
+    def __init__(self, size: int):
+        """
+        Initialize the NQueensSolver with the given board size.
+
         Args:
-            args: passed args to terminal
-        Returns - n if no error is detected
-    """
-    if len(args) != 2:
-        print('Usage: nqueens N')
-        exit(1)
+            size (int): The size of the board (number of queens).
+        """
+        self.size = size
+        self.lib = ctypes.CDLL("./libnqueens.so")
 
-    n = args[1]
-    if not n.isdigit():
+    def solve(self):
+        """ Solve the N Queens problem using the shared C library """
+        self.lib.solve_nqueens(self.size)
+
+
+def main():
+    """ Main function to handle command line arguments and start the solver """
+    if len(sys.argv) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
+
+    try:
+        n = int(sys.argv[1])
+    except ValueError:
         print("N must be a number")
-        exit(1)
+        sys.exit(1)
 
-    n = int(n)
     if n < 4:
         print("N must be at least 4")
-        exit(1)
-    return n
+        sys.exit(1)
+
+    solver = NQueensSolver(n)
+    solver.solve()
 
 
-def queen_recursion(n, chess_board, queen_position, column):
-    """ queen recursion """
-    if column > n - 1:
-        return queen_position
-    for i in range(n):
-        if i in queen_position.keys():
-            continue
-        for y in range(n):
-            if i - 1 != -1 and chess_board[i - 1][y] == 'Q':
-                continue
-            elif i - 1 != -1 and y + 1 != len(chess_board) and \
-                    chess_board[i - 1][y + 1] == 'Q':
-                continue
-            elif i - 1 != -1 and y - 1 != -1 and \
-                    chess_board[i - 1][y - 1] == 'Q':
-                continue
-            if i in queen_position.keys():
-                continue
-            chess_board[i][y] = 'Q'
-            queen_position[i] = y
-    positions = []
-    for key, value in queen_position.items():
-        positions.append([key, value])
-    print(positions)
-    queen_position.clear()
-    positions.clear()
-    if column < 3:
-        for i in range(n):
-            for y in range(n):
-                chess_board[i][y] = 0
-        i = y = 0
-        chess_board[0][column + 1] = 'Q'
-        queen_position[0] = column + 1
-        queen_recursion(n, chess_board, queen_position, column + 1)
-
-
-def check_queen(n: int):
-    """ check queens """
-    chess_board = []
-    for i in range(n):
-        chess_board.append([])
-        for y in range(n):
-            chess_board[i].append(0)
-    chess_board[0][0] = 'Q'
-    quen_position = {0: 0}
-    queen_recursion(n, chess_board, quen_position, 0)
-
-
-args = sys.argv
-n = check_n(args)
-check_queen(n)
+if __name__ == "__main__":
+    main()
