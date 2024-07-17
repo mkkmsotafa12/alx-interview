@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""
-A module contains a function to rotate a 2D Matrix 90 degrees.
-"""
+""" A module contains a function to rotate 2D Matrix """
 
 
 def rotate_2d_matrix(matrix):
@@ -15,9 +13,9 @@ def rotate_2d_matrix(matrix):
     """
 
     """ Transpose the matrix """
-    n = len(matrix)
-    for i in range(n):
-        for j in range(i + 1, n):
-            matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+    num = len(matrix)
+    for i in range(num):
+        for x in range(i + 1, num):
+            matrix[i][x], matrix[x][i] = matrix[x][i], matrix[i][x]
 
     matrix[:] = [row[::-1] for row in matrix]
