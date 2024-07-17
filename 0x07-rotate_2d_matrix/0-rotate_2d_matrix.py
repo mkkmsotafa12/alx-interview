@@ -14,7 +14,7 @@ def rotate_2d_matrix(matrix):
     The matrix must be edited in-place.
     """
 
-    """ transpose the matrix """
+    """ Transpose the matrix """
     n = len(matrix)
     for i in range(n):
         for j in range(i + 1, n):
