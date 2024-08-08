@@ -3,15 +3,12 @@
 
 
 def isWinner(x, nums):
-    """
-    Determines the overall winner of the prime game.
-
+    """ Determines the overall winner of the prime game.
     Args:
         x (int): The number of rounds.
         nums (list): Is an array of (n)
-
     Returns:
-        str: The name of the winner ('Maria' or 'Ben') or None if it's a tie.
+        str: The name of the winner ('Maria' or 'Ben') or None if it's a tie
     """
     if x <= 0 or nums is None or x != len(nums):
         return None
